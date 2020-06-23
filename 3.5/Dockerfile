@@ -15,6 +15,7 @@ RUN apt-get -y update -qq && \
     postgresql-contrib postgresql-12-postgis-3-scripts \
     apache2 php php-pgsql libapache2-mod-php \
     php-intl python3-setuptools python3-dev python3-pip \
+    nmap vim \
     python3-psycopg2 python3-tidylib git curl sudo && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
@@ -31,7 +32,8 @@ RUN pip3 install osmium
 
 # Nominatim install
 ENV NOMINATIM_VERSION v3.5.0
-RUN git clone --recursive https://github.com/openstreetmap/Nominatim ./src
+# RUN git clone --recursive https://github.com/openstreetmap/Nominatim ./src
+RUN git clone --recursive https://github.com/StrolyCom/Nominatim.git -b enable_post_branch ./src
 RUN cd ./src && git checkout tags/$NOMINATIM_VERSION && git submodule update --recursive --init && \
     mkdir build && cd build && cmake .. && make
 
