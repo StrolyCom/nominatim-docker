@@ -33,7 +33,7 @@ RUN pip3 install osmium
 # Nominatim install
 ENV NOMINATIM_VERSION v3.5.0
 RUN git clone --recursive https://github.com/StrolyCom/Nominatim -b high_performance_batch ./src
-RUN cd ./src && git checkout tags/$NOMINATIM_VERSION && git submodule update --recursive --init && \
+RUN cd ./src && git submodule update --recursive --init && \
     mkdir build && cd build && cmake .. && make
 
 # Apache configure
