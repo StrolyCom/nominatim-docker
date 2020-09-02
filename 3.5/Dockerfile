@@ -3,6 +3,11 @@ FROM ubuntu:focal
 ENV DEBIAN_FRONTEND noninteractive
 ENV LANG C.UTF-8
 
+ARG API_KEY
+RUN test -n "$API_KEY"
+RUN test "${API_KEY}" != "test_key"
+ENV API_KEY $API_KEY
+
 RUN apt-get -y update -qq && \
     apt-get -y install locales && \
     locale-gen en_US.UTF-8 && \
@@ -24,8 +29,8 @@ RUN apt-get -y update -qq && \
 WORKDIR /app
 
 # Configure postgres
-RUN echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/12/main/pg_hba.conf && \
-    echo "listen_addresses='*'" >> /etc/postgresql/12/main/postgresql.conf
+RUN echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/12/main/pg_hba.conf
+COPY postgresql.conf /etc/postgresql/12/main/postgresql.conf
 
 # Osmium install to run continuous updates
 RUN pip3 install osmium
@@ -35,6 +40,9 @@ ENV NOMINATIM_VERSION v3.5.0
 RUN git clone --recursive https://github.com/StrolyCom/Nominatim -b high_performance_batch ./src
 RUN cd ./src && git submodule update --recursive --init && \
     mkdir build && cd build && cmake .. && make
+
+# Add the first API_KEY to the php file
+RUN echo "array_push(\$api_keys, '${API_KEY}');" >> /app/src/settings/api_keys.php
 
 # Apache configure
 COPY local.php /app/src/build/settings/local.php

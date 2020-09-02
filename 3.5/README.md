@@ -1,9 +1,22 @@
 # Nominatim Docker (Nominatim version 3.5)
 
+In this version, it is necessary to add at least the first API_KEY necessary to access the 
+nominatim website, either by POST or GET request.
+
+This first `API_KEY` must be sent to the `docker build` command as `--build-arg`. 
+The build process will modify the necessary php files to add this key.
+
+Please complete `API_KEY=` with the value you want, for instance `API_KEY=test_key`:
+
+
 1. Build
   ```
-  docker build --pull --rm -t nominatim .
+  docker build --pull --rm -t nominatim . --build-arg API_KEY=
   ```
+
+  **NOTE**: To modify, add or remove `API_KEYS`, you need to modify the file `/app/src/settings/api_keys.php` inside the 
+  docker container.
+
 2. Copy <your_country>.osm.pbf to a local directory (i.e. /home/me/nominatimdata)
 
 3. Initialize Nominatim Database
@@ -48,6 +61,10 @@ If you want a different update source, you will need to declare `CONST_Replicati
 
   Now you will have a fully functioning nominatim instance available at : [http://localhost:7070/](http://localhost:7070). Unlike the previous versions
   this one does not store data in the docker context and this results to a much slimmer docker image.
+
+  **NOTE:** every request to any page in the website will require to send the API_KEY in the URL (with the `key` GET argument), for instance
+  [http://localhost:7070/search.php?q=kyoto&key=test_key](http://localhost:7070/search.php?q=kyoto&key=test_key). This value is whatever you
+  set as `--build-arg API_KEY=` for `docker build`.
 
 
 # Update
